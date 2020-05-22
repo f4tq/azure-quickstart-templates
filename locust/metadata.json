@@ -1,0 +1,9 @@
+{
+    "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+    "itemDisplayName": "Locust cluster with low-boom deployed on vmss",
+    "description": "Builds a locust cluster based on adobe low-boom",
+    "summary": "This template deploys a locust test cluster based on docker.io/f4tq/low-boom:latest agents VMSS node pool.",
+    "githubUsername": "f4tq",
+    "dateUpdated": "2020-05-22",
+    "type": "QuickStart"
+}
