@@ -44,7 +44,7 @@ TimeoutStopSec=10
 RestartSec=30
 Restart=always
 ExecStartPre=/usr/bin/docker pull docker.io/f4tq/low-boom:latest
-ExecStart=/bin/bash -c "exec docker run --net=host -e CORES=1 -e CORE_START=0 -e LOCUST_MASTER=tcp://$MASTER_IP:5557    -e TARGET_URL='$TARGET_URL'' \
+ExecStart=/bin/bash -c "exec docker run --net=host -e CORES=1 -e CORE_START=0 -e LOCUST_MASTER=tcp://$MASTER_IP:5557    -e TARGET_URL='$TARGET_URL' \
  -e LOCAL_HOSTNAME=$(hostname) docker.io/f4tq/low-boom:latest --disable-keepalive --timeout 60s --ping-weight 75 --delay-weight 72 --upload-weight 1 --download-weight 2 --max-conns-per-host 15000 "
 
 [Install]
