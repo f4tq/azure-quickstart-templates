@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "_artifactsLocation": {
+      "value": "https://raw.githubusercontent.com/f4tq/azure-quickstart-templates/master/locust/"
+    },
+    "locustTargetUrl": {
+      "value": "https://locust.micro.echosignpreview.com"
+    },
+    "vmName": {
+      "value": "locust-master"
+    },
+    "vmssName": {
+      "value": "locust-agent-vmss"
+    },
+    "location": {
+      "value": "eastus2"
+    },
+    "vmSize": {
+      "value": "Standard_F16s_v2"
+    },
+    "adminUsername": {
+      "value": "ubuntu"
+    },
+    "adminKey": {
+      "value": "ssh-rsa AAAAB3NzaC1yxxxxxxxxxxxxxxxxxxxxxxyyyyyyyyyyyyyyyyyyyyyyyyyzzzzzzzzz"
+    },
+    "spClientId": {
+      "value": "xxxxxx-yyyyyyy-zzz-1111-222"
+    },
+    "spClientSecret": {
+      "value": "12345678-1234-4567-89AB-123945678"
+    },
+    "virtualNetworkName": {
+      "value": "locust"
+    },
+    "vmssDnsLabelPrefix": {
+      "value": "locustattack"
+    }
+  }
+}

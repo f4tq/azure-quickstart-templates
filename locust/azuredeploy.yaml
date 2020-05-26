@@ -62,7 +62,7 @@ parameters:
       description: ServicePrincipal Secret
   dnsLabelPrefix:
     type: string
-    defaultValue: "[toLower(concat('k8s-cluster-', uniqueString(resourceGroup().id)))]"
+    defaultValue: "locustmaster"
     metadata:
       description: Unique DNS Name for the Public IP used to access the Virtual Machine.
   vmssDnsLabelPrefix:
@@ -112,8 +112,11 @@ variables:
   networkInterfaceName: "[concat(parameters('vmName'),'NetInt')]"
   locustMasterRef: "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),variables('networkSettings').subnet.locustMaster.name)]"
 
-  locustAgentRef: "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),
-    variables('networkSettings').subnet.locustAgent.name)]"
+  locustAgentRef: "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),variables('networkSettings').subnet.locustAgent.name)]"
+  
+  masterNSGName: "[concat(variables('networkSettings').virtualNetworkName,'master-nsg')]"
+  agentNSGName: "[concat(variables('networkSettings').virtualNetworkName,'agent-nsg')]"
+
   osDiskType: Standard_LRS
   scriptsDir: scripts
   masterScriptFileName: cloud-init-master.sh
@@ -144,6 +147,10 @@ resources:
   apiVersion: '2019-11-01'
   name: "[parameters('virtualNetworkName')]"
   location: "[parameters('location')]"
+  dependsOn:
+  - "[resourceId('Microsoft.Network/networkSecurityGroups', variables('agentNSGName'))]"
+  - "[resourceId('Microsoft.Network/networkSecurityGroups', variables('masterNSGName'))]"
+
   properties:
     addressSpace:
       addressPrefixes:
@@ -152,11 +159,14 @@ resources:
     - name: "[variables('networkSettings').subnet.locustAgent.name]"
       properties:
         addressPrefix: "[variables('networkSettings').subnet.locustAgent.prefix]"
-        networkSecurityGroup: "[ concat(variables('networkSettings').virtualNetworkName,'agent-nsg') ]"
+        networkSecurityGroup:
+           id: "[resourceId('Microsoft.Network/networkSecurityGroups', variables('agentNSGName'))]"
+
     - name: "[variables('networkSettings').subnet.locustMaster.name]"
       properties:
         addressPrefix: "[variables('networkSettings').subnet.locustMaster.prefix]"
-        networkSecurityGroup: "[ concat(variables('networkSettings').virtualNetworkName,'master-nsg') ]"
+        networkSecurityGroup:
+           id: "[resourceId('Microsoft.Network/networkSecurityGroups', variables('masterNSGName'))]"
 
 - type: Microsoft.Network/publicIPAddresses
   apiVersion: '2019-11-01'
@@ -171,7 +181,7 @@ resources:
 
 - apiVersion: '2019-11-01'
   type: Microsoft.Network/networkSecurityGroups
-  name: "[concat(variables('networkSettings').virtualNetworkName,'master-nsg')]"
+  name: "[variables('masterNSGName')]"
   location: "[parameters('location')]"
   properties:
     securityRules:
@@ -181,7 +191,7 @@ resources:
         protocol: Tcp
         sourcePortRange: "*"
         destinationPortRange: '22'
-        sourceAddressPrefix: "192.147.118.254/32"
+        sourceAddressPrefix: "192.147.118.254"
         destinationAddressPrefix: "*"
         access: Allow
         priority: 100
@@ -192,15 +202,15 @@ resources:
         protocol: Tcp
         sourcePortRange: "*"
         destinationPortRange: '80'
-        sourceAddressPrefix: "192.147.118.254/32"
+        sourceAddressPrefix: "192.147.118.254"
         destinationAddressPrefix: "*"
         access: Allow
-        priority: 100
+        priority: 101
         direction: Inbound
 
 - apiVersion: '2019-11-01'
   type: Microsoft.Network/networkSecurityGroups
-  name: "[concat(variables('networkSettings').virtualNetworkName,'agent-nsg')]"
+  name: "[variables('agentNSGName')]"
   location: "[parameters('location')]"
   properties:
     securityRules:
@@ -210,7 +220,7 @@ resources:
         protocol: Tcp
         sourcePortRange: "*"
         destinationPortRange: '22'
-        sourceAddressPrefix: "192.147.118.254/32"
+        sourceAddressPrefix: "192.147.118.254"
         destinationAddressPrefix: "*"
         access: Allow
         priority: 100
